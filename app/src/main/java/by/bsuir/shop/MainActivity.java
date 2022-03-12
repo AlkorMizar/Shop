@@ -1,25 +1,12 @@
 package by.bsuir.shop;
 
 
-import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.view.SurfaceControl;
-import android.view.Window;
-import android.view.WindowManager;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
 
-import com.google.android.gms.dynamic.SupportFragmentWrapper;
-import com.google.android.gms.maps.SupportMapFragment;
-
-import by.bsuir.shop.data.loaders.Filter;
 import by.bsuir.shop.databinding.ActivityMainBinding;
 import by.bsuir.shop.ui.favorite.FavoriteFragment;
 import by.bsuir.shop.ui.home.HomeFragment;
