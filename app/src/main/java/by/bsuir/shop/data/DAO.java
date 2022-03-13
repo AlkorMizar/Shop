@@ -17,4 +17,6 @@ public interface DAO {
     boolean isInFavorite(Item item,String user);
     void addItemToFav(Item item,String user);
     void deleteItemFromFav(Item item,String user);
+    void updateComment(Item item, String user,String comment);
+    String getComment(Item item, String user);
 }

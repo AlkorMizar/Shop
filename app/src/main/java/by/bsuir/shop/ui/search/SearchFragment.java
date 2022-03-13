@@ -22,13 +22,11 @@ public class SearchFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        System.out.println("JJJJJJJJJJJJJJJ");
         binding = FragmentSearchBinding.inflate(inflater, container, false);
         ArrayAdapter<String> spinnerAdapter=new ArrayAdapter<String>(this.getContext(), android.R.layout.simple_spinner_item,
                                                                     DAOFactory.getDAO().getCategories());
         binding.categoriesSpinner.setAdapter(spinnerAdapter);
         View root = binding.getRoot();
-        System.out.println("FFFFFFFFFFFFFF");
         binding.searchButton.setOnClickListener(view -> {
 
             Filter filter=new Filter();

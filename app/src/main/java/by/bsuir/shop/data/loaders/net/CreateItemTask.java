@@ -26,13 +26,14 @@ public class CreateItemTask extends Thread {
 
 
     public void run(){
-
+        System.out.println("1");
         String name=el.getElementsByTagName("name").item(0).getTextContent();
         String id=el.getAttribute("id");
         String imgUrl=el.getElementsByTagName("picture").item(0).getTextContent();
         String descr=el.getElementsByTagName("description").item(0).getTextContent();
         String cat=el.getElementsByTagName("categoryId").item(0).getTextContent();
-        String brand="";
+        String articul=el.getAttribute("articul");
+        String specification="";
         int price=0;
         NodeList list = el.getElementsByTagName("param");
 
@@ -43,10 +44,17 @@ public class CreateItemTask extends Thread {
             if (node.getNodeType() == Node.ELEMENT_NODE) {
 
                 Element param= (Element) node;
+
                 switch (param.getAttribute("name")){
-                    case "brand":
+                    case "specifications":
                         fl++;
-                        brand=param.getTextContent();
+                        NodeList listSpecific=param.getElementsByTagName("variant");
+                        StringBuilder spec=new StringBuilder();
+
+                        for (int t = 0; t < listSpecific.getLength(); t++ ){
+                            spec.append("\t"+listSpecific.item(t).getTextContent().replace("=","     ")+"\n");
+                        }
+                        specification=spec.toString();
                         break;
                     case "price_base":
                         fl++;
@@ -56,6 +64,6 @@ public class CreateItemTask extends Thread {
 
             }
         }
-        item.SetAll(id,name,price,imgUrl,cat,descr,brand);
+        item.SetAll(id,name,price,imgUrl,cat,descr,specification,articul);
     }
 }

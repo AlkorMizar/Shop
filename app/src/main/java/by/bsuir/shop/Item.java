@@ -12,11 +12,12 @@ public class Item {
     public  String description;
     public String specification;
     public byte[] img;
+    public String articul;
 
 
     public Item(){}
 
-    public void SetAll(String id, String name, int price, String imgURL, String categoryID, String description, String specification) {
+    public void SetAll(String id, String name, int price, String imgURL, String categoryID, String description, String specification,String articul) {
         this.id = id;
         this.name = name;
         this.price = price;
@@ -24,6 +25,7 @@ public class Item {
         this.categoryID = categoryID;
         this.description = description;
         this.specification = specification;
+        this.articul=articul;
     }
 
     @Override
@@ -40,6 +42,7 @@ public class Item {
     }
 
     public ContentValues getContentValues(){
+
         ContentValues cv=new ContentValues();
         cv.put("name",name);
         cv.put("id",id);
@@ -48,6 +51,7 @@ public class Item {
         cv.put("img",ImageLoder.loadBitmap(imgURL));
         cv.put("category_id",categoryID);
         cv.put("specification",specification);
+        cv.put("articul",articul);
 
         return cv;
     }

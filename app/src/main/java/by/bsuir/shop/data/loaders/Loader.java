@@ -20,7 +20,7 @@ public class Loader {
     public Loader(){
         netLoader=new NetLoader();
         db=new DB();
-        updateData();
+        //updateData();
         updater=new Timer();
     }
 
@@ -31,7 +31,7 @@ public class Loader {
             public void run() {
                 updateData();
             }
-        },TimeUnit.MINUTES.toMillis(2),TimeUnit.MINUTES.toMillis(2));
+        },0,TimeUnit.MINUTES.toMillis(2));
         return db;
     }
 

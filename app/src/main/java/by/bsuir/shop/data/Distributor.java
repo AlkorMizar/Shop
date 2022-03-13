@@ -82,4 +82,14 @@ public class Distributor implements DAO{
         db.deleteFavItem(item,user);
         //lock.readLock().unlock();
     }
+
+    @Override
+    public void updateComment(Item item, String user, String comment) {
+        db.updateComment(item,user,comment);
+    }
+
+    @Override
+    public String getComment(Item item, String user) {
+        return db.getComment(item,user);
+    }
 }

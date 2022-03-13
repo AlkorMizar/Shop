@@ -1,12 +1,11 @@
 package by.bsuir.shop;
-
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
@@ -34,8 +33,12 @@ public class ImageLoder {
         return null;
     }
 
-    public static void loadFromBytes(ImageView imageView,byte[] img){
-        Bitmap bmp = BitmapFactory.decodeByteArray(img, 0, img.length);
-        imageView.setImageBitmap(bmp);
+    public static void loadFromBytes(ImageView imageView, byte[] img, Drawable def){
+        try {
+            Bitmap bmp = BitmapFactory.decodeByteArray(img, 0, img.length);
+            imageView.setImageBitmap(bmp);
+        }catch (Exception e){
+            imageView.setImageDrawable(def);
+        }
     }
 }

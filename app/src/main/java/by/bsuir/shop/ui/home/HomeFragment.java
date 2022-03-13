@@ -8,14 +8,17 @@ import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import java.util.ArrayList;
 
 import by.bsuir.shop.Item;
 import by.bsuir.shop.MainActivity;
+import by.bsuir.shop.R;
 import by.bsuir.shop.data.DAOFactory;
 import by.bsuir.shop.data.loaders.Filter;
 import by.bsuir.shop.databinding.FragmentHomeBinding;
+import by.bsuir.shop.ui.item.ItemFragment;
 
 public class HomeFragment extends Fragment {
     private FragmentHomeBinding binding;
@@ -43,15 +46,10 @@ public class HomeFragment extends Fragment {
         }else{
             list=DAOFactory.getDAO().getAllItems();
         }
-        final HomeAdapter adapter = new HomeAdapter(this.getContext(), list);
+        final HomeAdapter adapter = new HomeAdapter(this.getContext(),this.getActivity(), list);
         ListView listView=binding.listView;
         listView.setAdapter(adapter);
-        System.out.println(list);
 
-        listView.setOnItemClickListener((parent, view, position, id) -> {
-            final Item item = (Item) parent.getItemAtPosition(position);
-            System.out.println(item);
-        });
         return root;
     }
 

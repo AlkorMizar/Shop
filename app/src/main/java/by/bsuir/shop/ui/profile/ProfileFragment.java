@@ -15,12 +15,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -52,6 +54,7 @@ import com.google.android.libraries.places.api.model.PlaceLikelihood;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.android.material.snackbar.Snackbar;
 
 
 import java.util.Arrays;
@@ -102,6 +105,28 @@ public class ProfileFragment extends Fragment implements OnMapReadyCallback {
         binding = FragmentProfileBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
+        binding.info.setOnClickListener(view ->
+                Snackbar.make(view,
+                                "Developer: Ahmed A. N. Group: 951005\nAssignment #2 overseen by: Petrovskaya V. V.",
+                                Snackbar.LENGTH_LONG)
+                        .setAction("Action", null)
+                        .show()
+        );
+        binding.darkLight.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if(isChecked){
+                if(AppCompatDelegate.getDefaultNightMode()!=AppCompatDelegate.MODE_NIGHT_YES)
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+            }else{
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+            }
+        });
+
+        if (AppCompatDelegate.getDefaultNightMode()==AppCompatDelegate.MODE_NIGHT_YES){
+            binding.darkLight.setChecked(true);
+        }
+
+
+
         if (savedInstanceState != null) {
             lastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
             cameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
@@ -128,6 +153,8 @@ public class ProfileFragment extends Fragment implements OnMapReadyCallback {
             signIn();
         });
 
+
+
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build();
@@ -136,6 +163,15 @@ public class ProfileFragment extends Fragment implements OnMapReadyCallback {
 
         return root;
 
+    }
+
+    private void signOut() {
+        mGoogleSignInClient.signOut()
+                .addOnCompleteListener(this.getActivity(), task -> {
+                    Toast.makeText(ctx, "Signed out", Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(ShopApplication.getAppContext(), MainActivity.class);
+                    startActivity(intent);
+                });
     }
 
 
@@ -148,7 +184,10 @@ public class ProfileFragment extends Fragment implements OnMapReadyCallback {
         if (account.getPhotoUrl() != null) {
             ImageLoder.loadImageOnImageView(binding.avatar, account.getPhotoUrl().toString());
         }
-
+        binding.outButton.setVisibility(View.VISIBLE);
+        binding.outButton.setOnClickListener(view -> {
+            signOut();
+        });
         binding.name.setVisibility(View.VISIBLE);
         binding.name.setText(account.getDisplayName());
 

@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import by.bsuir.shop.ImageLoder;
 import by.bsuir.shop.Item;
 import by.bsuir.shop.ShopApplication;
 import by.bsuir.shop.data.Pair;
@@ -37,6 +38,7 @@ public class DB {
                         "price INTEGER NOT NULL," +
                         "img BLOB," +
                         "specification TEXT," +
+                        "articul TEXT ,"+
                         "category_id TEXT NOT NULL,"+
                         "FOREIGN KEY (category_id)" +
                                 "REFERENCES categories (id) " +
@@ -46,6 +48,7 @@ public class DB {
             db.execSQL("CREATE TABLE IF NOT EXISTS favorite ("+"" +
                         "name TEXT NOT NULL,"+
                         "item_id TEXT NOT NULL,"+
+                        "comment TEXT,"   +
                         "PRIMARY KEY (name, item_id),"+
                         "FOREIGN KEY (item_id)" +
                             "REFERENCES items (id) " +
@@ -57,41 +60,30 @@ public class DB {
         resetTree();
     }
 
-    public boolean isEmpty(){
-
-        Cursor cursor = db.rawQuery(
-                "SELECT COUNT(*) FROM sqlite_master WHERE type = ? AND name = ? ;",
-                new String[] {"table", "items"}
-        );
-        if (!cursor.moveToFirst())
-        {
-            cursor.close();
-            return false;
-        }
-        int count = cursor.getInt(0);
-        if (count==0){
-            return false;
-        }
-        cursor.close();
-        cursor = db.rawQuery(
-                "SELECT COUNT(*) FROM items;",null);
-        if (!cursor.moveToFirst())
-        {
-            cursor.close();
-            return false;
-        }
-        count = cursor.getInt(0);
-        return count > 5;
-    }
-
     @Override
     protected void finalize() throws Throwable {
         db.close();
         super.finalize();
     }
 
+    public String getComment(Item item, String user){
+        Cursor query = db.rawQuery("SELECT comment FROM favorite WHERE name = ? AND item_id = ?",
+                new String[] {user, item.id});
+        if (query.moveToNext()){
+            return query.getString(0);
+        }
+        return "";
+    }
+
+    public void updateComment(Item item, String user,String comment){
+        db.execSQL(
+                "UPDATE favorite SET comment=? WHERE name = ? AND item_id = ?",
+                new String[] {comment,user, item.id}
+        );
+    }
+
     public void addFavItem(Item item, String user){
-        String query= String.format("INSERT OR IGNORE INTO favorite VALUES ('%s', '%s');",user,item.id);
+        String query= String.format("INSERT OR IGNORE INTO favorite VALUES ('%s', '%s',NULL);",user,item.id);
         db.execSQL(query);
     }
 
@@ -100,11 +92,19 @@ public class DB {
         db.execSQL(query);
     }
 
-    public void saveList(List<Item> list){
-        String query= "DELETE FROM items;";
+    public void saveList(List<Item> list) {
+        /*String query= "DELETE FROM items;";
         db.execSQL(query);
         for (Item item:list ) {
+            System.out.println("save item");
             db.insert("items",null,item.getContentValues());
+        insert or replace into
+        }*/
+        for (Item item : list) {
+            db.execSQL(
+                    "INSERT OR REPLACE INTO items (id,name,description,price,img,specification,articul,category_id) VALUES (?,?,?,?,?,?,?,?)",
+                    new Object[]{item.id,item.name,item.description,item.price, ImageLoder.loadBitmap(item.imgURL),item.specification,item.articul,item.categoryID}
+            );
         }
     }
 
@@ -112,11 +112,14 @@ public class DB {
         Cursor query = db.rawQuery("SELECT name,id,price,img,category_id FROM items;", null);
         ArrayList<Item> items=new ArrayList<>(query.getCount());
         while(query.moveToNext()){
+            System.out.println("getItem");
             Item item=new Item();
             item.name=query.getString(0);
             item.id=query.getString(1);
             item.price=query.getInt(2);
-            item.img= query.getBlob(3);
+            try {
+                item.img= query.getBlob(3);
+            }catch (Exception e){}
 
             items.add(item);
         }
@@ -127,6 +130,7 @@ public class DB {
         Cursor query = db.rawQuery("SELECT name FROM categories ORDER BY id;", null);
         ArrayList categories=new ArrayList<String>(query.getCount());
         while(query.moveToNext()){
+
             categories.add(query.getString(0));
         }
         return categories;
@@ -182,7 +186,10 @@ public class DB {
     }
 
     public Item getItem(Filter filter){
-        Cursor query = db.rawQuery("SELECT name,id,description,price,img,specification,category_id FROM items WHERE "+filter.getFilter()+";", null);
+        Cursor query = db.rawQuery("SELECT items.name,items.id,items.description,items.price,items.img,items.specification,categories.name,items.articul " +
+                "FROM items " +
+                "JOIN categories ON categories.id=items.category_id " +
+                "WHERE "+filter.getFilter()+";", null);
         Item item=new Item();
         if (query.moveToNext()){
             item.name=query.getString(0);
@@ -191,7 +198,8 @@ public class DB {
             item.price=query.getInt(3);
             item.img= query.getBlob(4);
             item.specification=query.getString(5);
-            item.categoryID=query.getString(5);
+            item.categoryID=query.getString(6);
+            item.articul=query.getString(7);
         }
         return item;
     }

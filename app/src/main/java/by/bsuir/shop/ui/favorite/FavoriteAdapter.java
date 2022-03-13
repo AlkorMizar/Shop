@@ -27,7 +27,12 @@ public class FavoriteAdapter extends BaseAdapter {
 
     FavoriteAdapter(Context context, ArrayList<Item> products) {
         ctx = context;
-        name=GoogleSignIn.getLastSignedInAccount(ctx).getDisplayName();
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(ctx);
+        if (account != null) {
+            name=account.getDisplayName();
+        }else{
+            name="unknown";
+        }
         objects = products;
         lInflater = (LayoutInflater) ctx
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -64,25 +69,19 @@ public class FavoriteAdapter extends BaseAdapter {
 
         Item p = getProduct(position);
 
-        ImageLoder.loadFromBytes(view.findViewById(R.id.image),p.img);
+        ImageLoder.loadFromBytes(view.findViewById(R.id.image),p.img,ctx.getDrawable(R.drawable.ic_loading));
         ((TextView) view.findViewById(R.id.name_lable)).setText(p.name);
         ((TextView) view.findViewById(R.id.price)).setText(p.price +"");
 
         ImageButton cbBuy = view.findViewById(R.id.favorite);
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(ctx);
-        if (account == null) {
-            cbBuy.setVisibility(View.INVISIBLE);
-        }
+
         // присваиваем чекбоксу обработчик
         cbBuy.setBackgroundColor(Color.TRANSPARENT);
         BaseAdapter adapter=this;
-        cbBuy.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DAOFactory.getDAO().deleteItemFromFav(p,name);
-                objects.remove(p);
-                adapter.notifyDataSetChanged();
-            }
+        cbBuy.setOnClickListener(v -> {
+            DAOFactory.getDAO().deleteItemFromFav(p,name);
+            objects.remove(p);
+            adapter.notifyDataSetChanged();
         });
         return view;
     }
